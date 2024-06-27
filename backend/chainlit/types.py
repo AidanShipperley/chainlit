@@ -124,7 +124,7 @@ class ActionSpec(DataClassJsonMixin):
 class AskSpec(DataClassJsonMixin):
     """Specification for asking the user."""
 
-    timeout: int
+    timeout: Optional[int]
     type: Literal["text", "file", "action"]
 
 
