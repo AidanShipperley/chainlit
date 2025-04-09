@@ -483,11 +483,16 @@ class ChainlitDataLayer(BaseDataLayer):
 
         thread = results[0]
 
-        # Get steps
+        # Get steps with feedback data
         steps_query = """
-        SELECT * FROM "Step" 
-        WHERE "threadId" = $1 
-        ORDER BY "startTime"
+        SELECT s.*,
+               f."id" as feedback_id,
+               f."value" as feedback_value,
+               f."comment" as feedback_comment
+        FROM "Step" s
+        LEFT JOIN "Feedback" f ON s."id" = f."stepId"
+        WHERE s."threadId" = $1
+        ORDER BY s."startTime"
         """
         steps_results = await self.execute_query(steps_query, {"thread_id": thread_id})
 
@@ -580,6 +585,16 @@ class ChainlitDataLayer(BaseDataLayer):
             showInput=row.get("showInput"),
             isError=row.get("isError"),
             end=row["endTime"].isoformat() if row.get("endTime") else None,
+            feedback=(
+                FeedbackDict(
+                    forId=str(row["id"]),
+                    id=row.get("feedback_id"),
+                    value=row.get("feedback_value"),
+                    comment=row.get("feedback_comment")
+                )
+                if row.get("feedback_id") is not None
+                else None
+            )
         )
 
     def _convert_element_row_to_dict(self, row: Dict) -> ElementDict:
