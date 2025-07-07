@@ -1,12 +1,30 @@
 # This is a simple example of a chainlit app.
+import chainlit as cl
 
-from chainlit import AskUserMessage, Message, on_chat_start
+commands = [
+    {"id": "Picture", "icon": "image", "description": "Use DALL-E"},
+    {"id": "Search", "icon": "globe", "description": "Find on the web"},
+    {
+        "id": "Canvas",
+        "icon": "pen-line",
+        "description": "Collaborate on writing and code",
+    },
+]
+
+@cl.on_chat_start
+async def start():
+    await cl.context.emitter.set_commands(commands)
 
 
-@on_chat_start
-async def main():
-    res = await AskUserMessage(content="What is your name?", timeout=30).send()
-    if res:
-        await Message(
-            content=f"Your name is: {res['output']}.\nChainlit installation is working!\nYou can now start building your own chainlit apps!",
-        ).send()
+@cl.on_message
+async def main(message: cl.Message):
+
+    if message.command:
+        await cl.Message(
+            content=f"You used the chat command: '{message}'"
+        )
+    
+    # Send a response back to the user
+    await cl.Message(
+        content=message.content
+    ).send()

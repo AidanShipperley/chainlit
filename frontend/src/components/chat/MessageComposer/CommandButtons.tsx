@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { X } from 'lucide-react';
 import { useRecoilValue } from 'recoil';
 
 import { ICommand, commandsState } from '@chainlit/react-client';
@@ -25,12 +26,41 @@ export const CommandButtons = ({
 }: Props) => {
   const commands = useRecoilValue(commandsState);
   const commandButtons = commands.filter((c) => !!c.button);
-
-  if (!commandButtons.length) return null;
+  
+  // Find the selected command if it's not a button command
+  const selectedCommand = commands.find(c => c.id === selectedCommandId && !c.button);
+  
+  // If no button commands and no selected non-button command, don't render
+  if (!commandButtons.length && !selectedCommand) return null;
 
   return (
-    <div className="flex gap-0 ml-1 flex-wrap">
+    <div className="flex gap-1 ml-1 flex-wrap">
       <TooltipProvider>
+        {/* Show selected non-button command as a button */}
+        {selectedCommand && (
+          <Tooltip key={selectedCommand.id}>
+            <TooltipTrigger asChild>
+              <Button
+                id={`command-${selectedCommand.id}`}
+                variant="ghost"
+                disabled={disabled}
+                className="p-2 h-9 text-[13px] font-medium rounded-full group hover:bg-[#E8F2FF] hover:dark:bg-[#1A3A52] transition-colors"
+                onClick={() => onCommandSelect(undefined)}
+              >
+                <Icon name={selectedCommand.icon} className="!h-5 !w-5 text-[#0066FF]" />
+                <span className="text-[#0066FF] max-w-full overflow-visible text-clip whitespace-normal">
+                  {selectedCommand.id}
+                </span>
+                <X className="!size-4 ml-1 text-[#0066FF] opacity-60 group-hover:opacity-100 transition-opacity" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Click to remove {selectedCommand.id}</p>
+            </TooltipContent>
+          </Tooltip>
+        )}
+        
+        {/* Show button commands */}
         {commandButtons.map((command) => (
           <Tooltip key={command.id}>
             <TooltipTrigger asChild>
@@ -39,9 +69,8 @@ export const CommandButtons = ({
                 variant="ghost"
                 disabled={disabled}
                 className={cn(
-                  'p-2 h-9 text-[13px] font-medium rounded-full',
-                  selectedCommandId === command.id &&
-                    'border-transparent text-[#08f] hover:text-[#08f] bg-[#DAEEFF] hover:bg-[#BDDCF4] dark:bg-[#2A4A6D] dark:text-[#48AAFF] dark:hover:bg-[#1A416A]'
+                  'p-2 h-9 text-[13px] font-medium rounded-full hover:bg-[#E8F2FF] hover:dark:bg-[#1A3A52] transition-colors group',
+                  selectedCommandId === command.id && 'text-[#0066FF]'
                 )}
                 onClick={() =>
                   selectedCommandId === command.id
@@ -49,7 +78,13 @@ export const CommandButtons = ({
                     : onCommandSelect(command)
                 }
               >
-                <Icon name={command.icon} className="!h-5 !w-5" />
+                <Icon 
+                  name={command.icon} 
+                  className={cn(
+                    "!h-5 !w-5",
+                    selectedCommandId === command.id && "text-[#0066FF]"
+                  )} 
+                />
                 <span
                   className={cn(
                     selectedCommandId === command.id
@@ -59,6 +94,9 @@ export const CommandButtons = ({
                 >
                   {command.id}
                 </span>
+                {selectedCommandId === command.id && (
+                  <X className="!size-4 ml-1 opacity-60 group-hover:opacity-100 transition-opacity" />
+                )}
               </Button>
             </TooltipTrigger>
             <TooltipContent>
