@@ -12,12 +12,6 @@ import { ICommand, commandsState } from '@chainlit/react-client';
 
 import AutoResizeTextarea from '@/components/AutoResizeTextarea';
 import Icon from '@/components/Icon';
-import {
-  Command,
-  CommandGroup,
-  CommandItem,
-  CommandList
-} from '@/components/ui/command';
 
 interface Props {
   id?: string;
@@ -57,6 +51,7 @@ const Input = forwardRef<InputMethods, Props>(
     const [commandInput, setCommandInput] = useState('');
     const [value, setValue] = useState('');
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const commandListRef = useRef<HTMLDivElement>(null);
 
     const reset = () => {
       setValue('');
@@ -93,6 +88,18 @@ const Input = forwardRef<InputMethods, Props>(
       // Reset selected index when filtered commands change
       setSelectedIndex(0);
     }, [filteredCommands.length]);
+
+    // Scroll selected item into view
+    useEffect(() => {
+      if (showCommands && commandListRef.current) {
+        const selectedElement = commandListRef.current.querySelector(
+          `[data-index="${selectedIndex}"]`
+        );
+        if (selectedElement) {
+          selectedElement.scrollIntoView({ block: 'nearest' });
+        }
+      }
+    }, [selectedIndex, showCommands]);
 
     const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       const newValue = e.target.value;
@@ -211,34 +218,33 @@ const Input = forwardRef<InputMethods, Props>(
 
         {showCommands && filteredCommands.length > 0 && (
           <div className="absolute z-50 -top-4 left-0 -translate-y-full">
-            <Command className="rounded-lg border shadow-md bg-background">
-              <CommandList>
-                <CommandGroup>
-                  {filteredCommands.map((command, index) => (
-                    <CommandItem
-                      key={command.id}
-                      onSelect={() => handleCommandSelect(command)}
-                      className={cn(
-                        'cursor-pointer command-item flex items-center space-x-2 p-2',
-                        index === selectedIndex && 'bg-accent'
-                      )}
-                      aria-selected={index === selectedIndex}
-                    >
-                      <Icon
-                        name={command.icon}
-                        className="!size-5 text-muted-foreground"
-                      />
-                      <div>
-                        <div className="font-medium">{command.id}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {command.description}
-                        </div>
+            <div className="rounded-lg border shadow-md bg-background p-2">
+              <div ref={commandListRef} className="max-h-[300px] overflow-y-auto">
+                {filteredCommands.map((command, index) => (
+                  <div
+                    key={command.id}
+                    data-index={index}
+                    onClick={() => handleCommandSelect(command)}
+                    className={cn(
+                      'cursor-pointer flex items-center space-x-2 p-2 rounded-md transition-colors',
+                      'hover:bg-accent hover:text-accent-foreground',
+                      index === selectedIndex && 'bg-accent text-accent-foreground'
+                    )}
+                  >
+                    <Icon
+                      name={command.icon}
+                      className="!size-5 text-muted-foreground"
+                    />
+                    <div>
+                      <div className="font-medium">{command.id}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {command.description}
                       </div>
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              </CommandList>
-            </Command>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         )}
       </div>
