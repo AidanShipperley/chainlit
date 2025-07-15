@@ -55,7 +55,7 @@ const McpButton = ({ disabled }: Props) => {
                 disabled={disabled}
                 variant="ghost"
                 size="icon"
-                className="hover:bg-muted relative"
+                className="hover:bg-muted relative rounded-full"
               >
                 {mcpLoading ? (
                   <AnimatedPlugIcon className="!size-5" />
