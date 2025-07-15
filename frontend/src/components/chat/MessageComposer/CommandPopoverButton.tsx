@@ -151,7 +151,7 @@ export const CommandPopoverButton = ({
       "transition-all duration-300 ease-out",
       isAnimating && "animate-command-shift"
     )}>
-      <style jsx>{`
+      <style>{`
         @keyframes command-shift {
           0% { transform: translateX(-10px); opacity: 0.8; }
           50% { transform: translateX(5px); }
