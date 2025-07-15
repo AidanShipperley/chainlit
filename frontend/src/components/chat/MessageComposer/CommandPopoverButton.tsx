@@ -119,7 +119,7 @@ export const CommandPopoverButton = ({
         }
         break;
       
-      case 'Enter':
+      case 'Enter': {
         e.preventDefault();
         e.stopPropagation();
         const selectedCmd = nonButtonCommands[selectedIndex];
@@ -128,6 +128,7 @@ export const CommandPopoverButton = ({
           setOpen(false);
         }
         break;
+      }
       
       case 'Escape':
         e.preventDefault();
