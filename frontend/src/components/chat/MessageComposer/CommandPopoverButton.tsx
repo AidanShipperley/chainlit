@@ -119,7 +119,7 @@ export const CommandPopoverButton = ({
         }
         break;
       
-      case 'Enter': {
+      case 'Enter':
         e.preventDefault();
         e.stopPropagation();
         const selectedCmd = nonButtonCommands[selectedIndex];
@@ -128,7 +128,6 @@ export const CommandPopoverButton = ({
           setOpen(false);
         }
         break;
-      }
       
       case 'Escape':
         e.preventDefault();
@@ -151,7 +150,7 @@ export const CommandPopoverButton = ({
       "transition-all duration-300 ease-out",
       isAnimating && "animate-command-shift"
     )}>
-      <style>{`
+      <style jsx>{`
         @keyframes command-shift {
           0% { transform: translateX(-10px); opacity: 0.8; }
           50% { transform: translateX(5px); }
@@ -188,10 +187,11 @@ export const CommandPopoverButton = ({
             variant="ghost"
             size="sm"
             className={cn(
-              "flex items-center gap-1.5 h-9 px-3 rounded-full font-medium text-[13px]",
+              "flex items-center h-9 rounded-full font-medium text-[13px]",
               "hover:bg-muted hover:dark:bg-muted transition-all duration-200",
               "focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
               open && "bg-muted/50",
+              hasSelectedNonButtonCommand ? "p-2" : "px-3 gap-1.5",
               !hasSelectedNonButtonCommand && "command-button-expanded"
             )}
             disabled={disabled}
@@ -200,17 +200,16 @@ export const CommandPopoverButton = ({
             }}
           >
             <Settings2 className="!size-5 transition-transform duration-200" />
-            <span 
-              className={cn(
-                "overflow-hidden transition-all duration-300",
-                hasSelectedNonButtonCommand ? "w-0 opacity-0" : "w-auto opacity-100"
-              )}
-              style={{
-                maxWidth: hasSelectedNonButtonCommand ? '0' : '100px'
-              }}
-            >
-              Tools
-            </span>
+            {!hasSelectedNonButtonCommand && (
+              <span 
+                className="overflow-hidden transition-all duration-300 opacity-100 w-auto"
+                style={{
+                  maxWidth: '100px'
+                }}
+              >
+                Tools
+              </span>
+            )}
           </Button>
         </PopoverTrigger>
         <PopoverContent
