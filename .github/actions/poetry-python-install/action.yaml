@@ -26,9 +26,6 @@ runs:
       with:
         path: ~/.local
         key: poetry-${{ runner.os }}-${{ inputs.poetry-version }}-0
-    - name: Install Poetry
-      run: pipx install 'poetry==${{ inputs.poetry-version }}'
-      shell: bash
     - name: Set up Python ${{ inputs.python-version }}
       id: setup_python
       uses: actions/setup-python@v5
@@ -36,9 +33,12 @@ runs:
         python-version: ${{ inputs.python-version }}
         cache: poetry
         cache-dependency-path: ${{ inputs.poetry-working-directory }}/poetry.lock
+    - name: Install Poetry
+      run: pipx install --python "${{ steps.setup_python.outputs.python-path }}" "poetry==${{ inputs.poetry-version }}"
+      shell: bash
     - name: Set Poetry environment
-      run: poetry -C '${{ inputs.poetry-working-directory }}' env use '${{ steps.setup_python.outputs.python-path }}'
+      run: poetry -C "${{ inputs.poetry-working-directory }}" env use "${{ steps.setup_python.outputs.python-path }}"
       shell: bash
     - name: Install Python dependencies
-      run: poetry -C '${{ inputs.poetry-working-directory }}' install ${{ inputs.poetry-install-args }}
+      run: poetry -C "${{ inputs.poetry-working-directory }}" install ${{ inputs.poetry-install-args }}
       shell: bash
