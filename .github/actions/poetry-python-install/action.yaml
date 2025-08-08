@@ -26,6 +26,7 @@ runs:
       with:
         path: ~/.local
         key: poetry-${{ runner.os }}-${{ inputs.poetry-version }}-0
+
     - name: Set up Python ${{ inputs.python-version }}
       id: setup_python
       uses: actions/setup-python@v5
@@ -33,12 +34,20 @@ runs:
         python-version: ${{ inputs.python-version }}
         cache: poetry
         cache-dependency-path: ${{ inputs.poetry-working-directory }}/poetry.lock
+
+    - name: Ensure Poetry on PATH (Unix)
+      if: runner.os != 'Windows'
+      shell: bash
+      run: echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
     - name: Install Poetry
+      shell: bash
       run: pipx install --python "${{ steps.setup_python.outputs.python-path }}" "poetry==${{ inputs.poetry-version }}"
-      shell: bash
+
     - name: Set Poetry environment
+      shell: bash
       run: poetry -C "${{ inputs.poetry-working-directory }}" env use "${{ steps.setup_python.outputs.python-path }}"
-      shell: bash
+
     - name: Install Python dependencies
-      run: poetry -C "${{ inputs.poetry-working-directory }}" install ${{ inputs.poetry-install-args }}
       shell: bash
+      run: poetry -C "${{ inputs.poetry-working-directory }}" install ${{ inputs.poetry-install-args }}
